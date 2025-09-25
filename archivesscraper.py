@@ -7,12 +7,12 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
-# --- Configuration ---
+
 BASE_URL = "https://www.strongmanarchives.com/"
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 }
-# Using 20 concurrent threads for scraping. You can increase this if you have a very fast connection.
+# Using 20 concurrent threads for scraping. You can increase this if you have a very fast connection, but request permission first!!.
 MAX_WORKERS = 20
 
 def scrape_athlete_details(athlete_url, athlete_name):
@@ -28,7 +28,7 @@ def scrape_athlete_details(athlete_url, athlete_name):
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'lxml')
 
-        # --- Scrape the Contests Table (id="CompTable") ---
+
         contest_table = soup.find('table', id='CompTable')
         if contest_table:
             tbody = contest_table.find('tbody')
@@ -43,7 +43,7 @@ def scrape_athlete_details(athlete_url, athlete_name):
                             'placing': cells[5].text.strip(), 'athlete_url': athlete_url
                         })
 
-        # --- Scrape the Events/Lifts Table (id="EventTable") ---
+
         event_table = soup.find('table', id='EventTable')
         if event_table:
             tbody = event_table.find('tbody')
@@ -58,11 +58,11 @@ def scrape_athlete_details(athlete_url, athlete_name):
                             'athlete_url': athlete_url
                         })
     except requests.exceptions.RequestException:
-        # Errors will be handled by not returning data for this athlete.
-        # We avoid printing here to keep the progress bar clean.
+
+
         pass
     
-    # No time.sleep() for maximum speed
+
     return contests, events
 
 def get_all_athlete_links():
@@ -117,7 +117,7 @@ def get_all_athlete_links():
     print("\nDiscovery phase complete.")
     return athlete_metadata, athletes_to_scrape
 
-# --- Main execution block ---
+
 if __name__ == "__main__":
     print("Starting Strongman Archives Scraper 🏋️ (Press Ctrl+C to stop and save)")
     start_time = time.time()
@@ -127,16 +127,16 @@ if __name__ == "__main__":
     all_events = []
 
     try:
-        # Phase 1: Discover all athlete URLs first.
+
         all_athletes_metadata, tasks = get_all_athlete_links()
         
-        # Phase 2: Scrape details concurrently with a progress bar.
+
         print(f"Scraping details for {len(tasks)} athletes using {MAX_WORKERS} workers...")
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            # The lambda function unpacks the tuple for the function arguments
+
             results = list(tqdm(executor.map(lambda p: scrape_athlete_details(*p), tasks), total=len(tasks)))
 
-        # Process the results from all threads
+
         for contests_data, events_data in results:
             all_contests.extend(contests_data)
             all_events.extend(events_data)
