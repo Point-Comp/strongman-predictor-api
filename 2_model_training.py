@@ -1,25 +1,22 @@
-# 2_model_training.py (Final Version with Reproducibility)
+# 2_model_training.py (Final)
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-import random # Import the random library
+import random 
 from tensorflow import keras
 from tensorflow.keras import layers
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-# --- SET SEEDS FOR REPRODUCIBILITY ---
-# The number 42 is arbitrary; any number will do, as long as it's the same each time.
+
 np.random.seed(42)
 tf.random.set_seed(42)
 random.seed(42)
-# ------------------------------------
+
 
 def create_training_set(cleaned_data, athlete_profiles):
-    """
-    Creates the final training dataset by simulating each competition.
-    """
+    
     feature_columns = athlete_profiles.columns.tolist()
     X_data = []
     y_data = []
@@ -50,9 +47,7 @@ def create_training_set(cleaned_data, athlete_profiles):
     return np.array(X_data), np.array(y_data)
 
 def run_training(cleaned_data_path, profile_path, model_save_path, scaler_save_path):
-    """
-    Loads data, trains the model, and saves the artifacts.
-    """
+
     print("Step 1: Loading preprocessed data...")
     cleaned_data = pd.read_csv(cleaned_data_path)
     athlete_profiles = pd.read_csv(profile_path, index_col='athlete_name')
